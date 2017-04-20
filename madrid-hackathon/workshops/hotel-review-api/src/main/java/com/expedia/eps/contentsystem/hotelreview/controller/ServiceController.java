@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.expedia.eps.contentsystem.hotelreview.domain.HotelReviewAnalysisResponse;
+import com.expedia.eps.contentsystem.hotelreview.domain.UserReviewResponse;
 import com.expedia.eps.contentsystem.hotelreview.service.HotelReviewService;
 
 import io.swagger.annotations.Api;
@@ -40,6 +41,21 @@ public class ServiceController {
 
         // return response
         return ResponseEntity.ok(new Response(response.isSuccess(), text));
+    }
+
+
+    @RequestMapping(value = "/dosomethingelse", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Response> doSomethingElse() throws Exception {
+
+        // Start coding service implementation here..
+        //
+        // .. this is just a dummy example that calls the HotelReviewAnalyzer service
+        UserReviewResponse response = reviewService.reviews("41308", 0, 10);
+        //
+        //
+
+        // return response
+        return ResponseEntity.ok(new Response(response.getSuccess(), response.getDetails().getReviewCollection().getReview().get(0).getReviewText()));
     }
 
 
