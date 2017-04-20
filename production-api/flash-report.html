@@ -24,11 +24,8 @@
 	</ul>
 </i>
 <div id="container" style="width:100%; height:400px;"></div>
-<p>
-	Summary of hotel and compset performance for past and future stay dates
-</p>
 <ul>
-<li><b>Year To Date Stays</b>: represents the YOY production trend (for hotel and compset) considering all stay dates starting beginning of the year until the report date</li>
+<li><b>Year To Date Stays</b>: represents the YOY production trend (for hotel and compatitors set) considering all stay dates starting beginning of the year until the report date</li>
 <li><b>Next Week Stays</b>: represents the YOY production trend considering all stay dates for the week following the report date</li>
 <li><b>Next 4 Weeks Stays</b>: represents the YOY production trend considering all stay dates for the 4 weeks following the report date</li>
 </ul>
@@ -36,6 +33,15 @@
 <li><b>Net Room Night</b>: represents the total number of reservations the hotel will deliver (if cancellations are made, then they are considered in the calculation)</li>
 <li><b>Average Daily Rate</b>: base rate per room night for hotel rooms</li>
 </ul>
+
+<p>
+	The competitors set is calculated based on: 
+	<ul>
+		<li>price: it contains hotels with an ADR of +/- 10% of hotel ADR in last 12 months</li>
+        <li>proximity: circle radius expands from 3km to 6km to 9km and stops when at least 4 hotels are included in your competitors set.</br>
+          If less than 4 hotels are found at the 9km radius mark, no comp set will be displayed for that hotel</li>
+	</ul>
+</p>
 
 <script>
 function filterResults(raw, allowed){
@@ -87,7 +93,7 @@ $.ajax({
 			  symbolWidth: 14,
 			},
 			title: {
-				  text: 'Flash Report'
+				  text: 'Summary of hotel and compset performance for past and future stay dates'
 			},
 			plotOptions: {
 				column: {
