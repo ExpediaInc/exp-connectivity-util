@@ -2,8 +2,8 @@ package com.expedia.eps.sync;
 
 import static com.expedia.eps.product.utils.Defaults.defaultRoomType;
 import static com.expedia.eps.property.model.PhoneNumberType.PHONE;
-import static com.expedia.eps.property.model.StatusCodes.EXPEDIAIDASSIGNED;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +44,7 @@ public class OnboardingExample {
     public void onboardProperty() {
 
         final String requestId = randomUUID().toString();
+        final String correlationId = randomUUID().toString();
         final Property property = buildTestProperty(requestId);
         final String providerId = "1000";
 
@@ -62,10 +63,10 @@ public class OnboardingExample {
 
         // Poll the server until onboarding process is complete
         final Integer expediaId = propertyApi
-            .getPropertyStatus(randomUUID().toString(), providerId, onboardedProperty.getProviderPropertyId())
+            .getPropertyStatus(correlationId, providerId, onboardedProperty.getProviderPropertyId())
             .map(ExpediaResponse::getEntity)
             .repeatWhen(observable -> observable.delay(5, SECONDS))
-            .first(response -> response.getCode().equals(EXPEDIAIDASSIGNED))
+            .first(response -> nonNull(response.getExpediaId()))
             .map(PropertyStatus::getExpediaId)
             .toBlocking()
             .single();
