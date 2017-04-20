@@ -5,7 +5,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNO
 import static java.util.Optional.ofNullable;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
-import com.expedia.eps.ExpediaAuthenticationInterceptor;
 import com.expedia.eps.ExpediaCredentials;
 import com.expedia.eps.image.ImageApi;
 import com.expedia.eps.product.ProductApi;
@@ -24,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 import feign.Logger;
+import feign.auth.BasicAuthRequestInterceptor;
 import feign.hystrix.HystrixFeign;
 import feign.hystrix.SetterFactory;
 import feign.jackson.JacksonDecoder;
@@ -54,10 +54,8 @@ public class ExpediaConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public ExpediaAuthenticationInterceptor expediaAuthenticator(ExpediaCredentials credentials) {
-        return ExpediaAuthenticationInterceptor.builder()
-            .credentials(credentials)
-            .build();
+    public BasicAuthRequestInterceptor expediaAuthenticator(ExpediaCredentials credentials) {
+        return new BasicAuthRequestInterceptor(credentials.getUsername(), credentials.getPassword());
     }
 
     @Bean
@@ -90,7 +88,7 @@ public class ExpediaConfig {
     @Bean
     public ImageApi imageApi(@Value("${expedia.imageApi.url}") String imageApiUrl,
                              SetterFactory customHystrixSetter,
-                             ExpediaAuthenticationInterceptor authenticationInterceptor,
+                             BasicAuthRequestInterceptor authenticationInterceptor,
                              ExpediaRetryer expediaRetryer,
                              JacksonEncoder jsonEncoder,
                              JacksonDecoder jsonDecoder) {
@@ -108,7 +106,7 @@ public class ExpediaConfig {
     @Bean
     public ProductApi productApi(@Value("${expedia.productApi.url}") String productApiUrl,
                                  SetterFactory customHystrixSetter,
-                                 ExpediaAuthenticationInterceptor authenticationInterceptor,
+                                 BasicAuthRequestInterceptor authenticationInterceptor,
                                  ExpediaRetryer expediaRetryer,
                                  JacksonEncoder jsonEncoder,
                                  JacksonDecoder jsonDecoder) {
@@ -126,18 +124,18 @@ public class ExpediaConfig {
     @Bean
     public PropertyApi propertyApi(@Value("${expedia.propertyApi.url}") String propertyApiUrl,
                                    SetterFactory customHystrixSetter,
-                                   ExpediaAuthenticationInterceptor authenticationInterceptor,
+                                   BasicAuthRequestInterceptor authenticationInterceptor,
                                    ExpediaRetryer expediaRetryer,
                                    JacksonEncoder jsonEncoder,
                                    JacksonDecoder jsonDecoder) {
         return HystrixFeign.builder()
-                .setterFactory(customHystrixSetter)
-                .decoder(jsonDecoder)
-                .encoder(jsonEncoder)
-                .logger(new Slf4jLogger(PropertyApi.class))
-                .logLevel(Logger.Level.FULL)
-                .retryer(expediaRetryer)
-                .requestInterceptor(authenticationInterceptor)
-                .target(PropertyApi.class, propertyApiUrl);
+            .setterFactory(customHystrixSetter)
+            .decoder(jsonDecoder)
+            .encoder(jsonEncoder)
+            .logger(new Slf4jLogger(PropertyApi.class))
+            .logLevel(Logger.Level.FULL)
+            .retryer(expediaRetryer)
+            .requestInterceptor(authenticationInterceptor)
+            .target(PropertyApi.class, propertyApiUrl);
     }
 }

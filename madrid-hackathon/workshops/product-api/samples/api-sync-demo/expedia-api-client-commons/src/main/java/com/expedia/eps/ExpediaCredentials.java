@@ -5,7 +5,9 @@ import static java.util.Base64.getEncoder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Builder
 @AllArgsConstructor
 public class ExpediaCredentials {
