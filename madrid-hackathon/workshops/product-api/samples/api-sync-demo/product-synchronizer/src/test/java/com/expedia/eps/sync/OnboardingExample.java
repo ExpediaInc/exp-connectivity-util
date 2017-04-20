@@ -17,9 +17,7 @@ import com.expedia.eps.property.model.Contact;
 import com.expedia.eps.property.model.PhoneNumber;
 import com.expedia.eps.property.model.Property;
 import com.expedia.eps.property.model.PropertyContacts;
-import com.expedia.eps.property.model.PropertyResponse;
 import com.expedia.eps.property.model.PropertyStatus;
-import com.expedia.eps.property.model.StatusCodes;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,17 +48,14 @@ public class OnboardingExample {
         final String providerId = "1000";
 
         // Create the property On Expedia
-        final PropertyResponse propertyResponse = propertyApi
+        final List<Property> properties = propertyApi
             .createOrUpdateProperties(requestId, providerId, singletonList(property))
             .map(ExpediaResponse::getEntity)
             .toBlocking()
             .single();
 
-        assertThat(propertyResponse).isNotNull();
-        assertThat(propertyResponse.getProperties()).isNotEmpty();
-
         // Obtain the onboarded property from the response
-        final Property onboardedProperty = propertyResponse.getProperties()
+        final Property onboardedProperty = properties
             .stream()
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No property has been created"));
