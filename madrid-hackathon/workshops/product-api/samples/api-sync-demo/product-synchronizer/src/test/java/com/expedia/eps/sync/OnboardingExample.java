@@ -52,7 +52,7 @@ public class OnboardingExample {
             .createOrUpdateProperties(requestId, providerId, singletonList(property))
             .map(ExpediaResponse::getEntity)
             .toBlocking()
-            .single();
+            .first();
 
         // Obtain the onboarded property from the response
         final Property onboardedProperty = properties
@@ -65,7 +65,7 @@ public class OnboardingExample {
             .getPropertyStatus(randomUUID().toString(), providerId, onboardedProperty.getProviderPropertyId())
             .map(ExpediaResponse::getEntity)
             .repeatWhen(observable -> observable.delay(5, SECONDS))
-            .takeUntil(response -> response.getCode().equals(EXPEDIAIDASSIGNED))
+            .first(response -> response.getCode().equals(EXPEDIAIDASSIGNED))
             .map(PropertyStatus::getExpediaId)
             .toBlocking()
             .single();
@@ -77,7 +77,7 @@ public class OnboardingExample {
             .createRoomType(randomUUID().toString(), expediaId, defaultRoomType("Test Room"))
             .map(ExpediaResponse::getEntity)
             .toBlocking()
-            .single();
+            .first();
 
         assertThat(newRoomType.getResourceId()).isNotNull();
     }
