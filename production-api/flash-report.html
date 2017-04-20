@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>Flash Report</title>
+
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js"></script>
+</head>
+
+<body>
+<div id="container" style="width:100%; height:400px;"></div>
+<p>
+	Summary of hotel and compset performance for past and future stay dates
+</p>
+<ul>
+<li><b>Year To Date Stays</b>: represents the YOY production trend (for hotel and compset) considering all stay dates starting beginning of the year until the report date</li>
+<li><b>Next Week Stays</b>: represents the YOY production trend considering all stay dates for the week following the report date</li>
+<li><b>Next 4 Weeks Stays</b>: represents the YOY production trend considering all stay dates for the 4 weeks following the report date</li>
+</ul>
+<ul>
+<li><b>Net Room Night</b>: represents the total number of reservations the hotel will deliver (if cancellations are made, then they are considered in the calculation)</li>
+<li><b>Average Daily Rate</b>: base rate per room night for hotel rooms</li>
+</ul>
+
+<script>
+function filterResults(raw, allowed){
+	return Object.keys(raw)
+		.filter(key => allowed.includes(key))
+		.reduce((obj, key) => {
+			obj[key] = raw[key];
+			return obj;
+		}, {});
+}
+
+$.ajax({
+	url: 'https://services.expediapartnercentral.com/production-api/FlashReport?htid=17104728&%24format=json', 
+	type: "GET",
+	dataType: 'json',
+    async: false,
+	beforeSend: function (xhr) {
+		xhr.setRequestHeader ("Authorization", "Basic " + btoa("EQC17104728hotel:Work&Test2"));
+	},
+	success: function (resultData) {
+		var raw = resultData.value[0];
+		var hotel_nrn = 	['ytd_hotel_nrn_delta', 'nw_hotel_nrn_delta', 'n4w_hotel_nrn_delta'];
+		var hotel_adr = 	['ytd_hotel_adr_delta', 'nw_hotel_adr_delta', 'n4w_hotel_adr_delta'];
+		var compset_nrn = ['ytd_compset_nrn_delta', 'nw_compset_nrn_delta', 'n4w_compset_nrn_delta'];
+		var compset_adr = ['ytd_compset_adr_delta', 'nw_compset_adr_delta', 'n4w_compset_adr_delta'];
+
+		var filtered_hotel_nrn = filterResults(raw, hotel_nrn);
+		var filtered_hotel_adr = filterResults(raw, hotel_adr);
+		var filtered_compset_nrn = filterResults(raw, compset_nrn);
+		var filtered_compset_adr = filterResults(raw, compset_adr);
+						
+		Highcharts.chart('container', {
+			credits: { enabled: false },
+			chart: { 
+				animation: false,
+				type: 'column',
+				style: {
+					color: '#616161',
+					fontFamily: '"Helvetica Neue", Arial, "Lucida Grande", sans-serif'
+				}
+			},
+			legend: {
+			  layout: 'horizontal',
+			  borderWidth: 0,
+			  itemMarginBottom: 12,
+			  itemStyle: { color: '#616161', fontSize: '13.5px', fontWeight: 'normal' },
+			  padding: 0,
+			  symbolHeight: 14,
+			  symbolWidth: 14,
+			},
+			title: {
+				  text: 'Flash Report'
+			},
+			plotOptions: {
+				column: {
+					pointPadding: 0.1,
+					borderWidth: 0
+				}
+			},
+			xAxis: {
+			  categories: ['Year To Date Stays', 'Next Week Stays', 'Next 4 Weeks Stays'],
+			  labels: { style: { color: '#616161' } }
+			},
+			yAxis: {
+			  labels: {
+				formatter: function () {
+				  return numeral(this.value).format('0 %');
+				},
+				style: { color: '#616161' }
+			  },
+			  title: null
+			},
+			series: [
+				{ name: "Hotel NRN", data: $.map(filtered_hotel_nrn, function(value, index) {return [value];})},
+				{ name: "Hotel ADR", data: $.map(filtered_hotel_adr, function(value, index) {return [value];})},
+				{ name: "Compset NRN", data: $.map(filtered_compset_nrn, function(value, index) {return [value];})},
+				{ name: "Compset ADR", data: $.map(filtered_compset_adr, function(value, index) {return [value];})}
+			]
+		});
+	}
+});
+</script>
+
+</body>
+</html>
