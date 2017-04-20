@@ -2,6 +2,7 @@ package com.expedia.eps.sync;
 
 import static com.expedia.eps.product.utils.Defaults.defaultRoomType;
 import static com.expedia.eps.property.model.PhoneNumberType.PHONE;
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.UUID.randomUUID;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Random;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -95,20 +97,12 @@ public class OnboardingExample {
                                                             .countryCode("Spain")
                                                             .build());
 
-        // Mocked contact
-        final Contact contact = Contact.builder()
-            .firstName("John")
-            .lastName("Smith")
-            .emails(singletonList("JohnSmith@nowhere.com"))
-            .phoneNumbers(singletonList(PhoneNumber.builder()
-                                            .phoneNumberType(PHONE)
-                                            .areaCode("1")
-                                            .countryAccessCode("1")
-                                            .number("1234567")
-                                            .build()))
-            .build();
+        // Mocked contacts
         final PropertyContacts contracts = PropertyContacts.builder()
-            .property(contact)
+            .property(mockedContact("Jimi", "Hendrix"))
+            .generalManager(mockedContact("Janes", "Joplin"))
+            .reservationManager(mockedContact("Jimmy", "Page"))
+            .alternateReservationManager(mockedContact("Muddy", "Waters"))
             .build();
 
         // Mocked property
@@ -121,5 +115,23 @@ public class OnboardingExample {
             .currencyCode("EUR")
             .contacts(contracts)
             .build();
+    }
+
+    private Contact mockedContact(String firstName, String lastName) {
+        return Contact.builder()
+            .firstName(firstName)
+            .lastName(lastName)
+            .emails(singletonList(format("%s%s@nowhere.com", firstName, lastName)))
+            .phoneNumbers(singletonList(PhoneNumber.builder()
+                                            .phoneNumberType(PHONE)
+                                            .areaCode("1")
+                                            .countryAccessCode("1")
+                                            .number(randomPhone())
+                                            .build()))
+            .build();
+    }
+
+    private String randomPhone() {
+        return String.valueOf(new Random().nextInt((9999999 - 9000000) + 1) + 90000000);
     }
 }
