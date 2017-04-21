@@ -11,26 +11,20 @@ import feign.Param;
 import feign.RequestLine;
 import rx.Observable;
 
-public interface PropertyApi {
+public interface PropertyApi
+{
 
-    //    @Headers({
-//        "Request-ID: {guid}",
-//        "Accept: application/json"
-//    })
-//    @RequestLine("GET /properties/v1/{provider}/{providerPropertyId}")
-//    Observable<ExpediaResponse<Property>> getProperty(@Param("guid") String requestId,
-//                                                            @Param("provider") String provider,
-//                                                            @Param("providerPropertyId") String providerPropertyId);
-//
-    @Headers({
-        "Request-ID: {guid}",
-        "Accept: application/json",
-        "Content-Type: application/json"
-    })
+    @Headers({"Request-ID: {guid}", "Accept: application/json"})
+    @RequestLine("GET /properties/v1/{provider}/{providerPropertyId}")
+    Observable<ExpediaResponse<Property>> getProperty(@Param("guid") String requestId,
+                                                      @Param("provider") String provider,
+                                                      @Param("providerPropertyId") String providerPropertyId);
+
+    @Headers({"Request-ID: {guid}", "Accept: application/json", "Content-Type: application/json"})
     @RequestLine("POST /properties/v1/{provider}")
     Observable<ExpediaResponse<List<Property>>> createOrUpdateProperties(@Param("guid") String requestId,
-                                                                           @Param("provider") String provider,
-                                                                           List<Property> properties);
+                                                                         @Param("provider") String provider,
+                                                                         List<Property> properties);
 //
 //    @Headers({
 //        "Request-ID: {guid}",
@@ -42,10 +36,7 @@ public interface PropertyApi {
 //                                               @Param("provider") String provider,
 //                                               @Param("providerPropertyId") String providerPropertyId);
 
-    @Headers({
-        "Request-ID: {guid}",
-        "Accept: application/json"
-    })
+    @Headers({"Request-ID: {guid}", "Accept: application/json"})
     @RequestLine("GET /properties/v1/{provider}/{providerPropertyId}/status")
     Observable<ExpediaResponse<PropertyStatus>> getPropertyStatus(@Param("guid") String requestId,
                                                                   @Param("provider") String provider,

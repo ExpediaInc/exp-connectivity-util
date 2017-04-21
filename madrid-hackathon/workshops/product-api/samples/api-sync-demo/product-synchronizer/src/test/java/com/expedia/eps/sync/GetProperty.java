@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.expedia.eps.ExpediaResponse;
 import com.expedia.eps.property.PropertyApi;
+import com.expedia.eps.property.model.Property;
 import com.expedia.eps.property.model.PropertyStatus;
 
 import org.junit.Test;
@@ -27,13 +28,25 @@ public class GetProperty {
     @Test
     public void getProperty() {
 
-        final String requestId = randomUUID().toString();
+        final String correlationId = randomUUID().toString();
+        final String propertyId = "11112";
 
-        final PropertyStatus status = propertyApi.getPropertyStatus(requestId, "1000", "11275")
+        final PropertyStatus status = propertyApi.getPropertyStatus(correlationId, "1000", propertyId)
             .map(ExpediaResponse::getEntity)
             .toBlocking()
             .single();
 
         assertThat(status.getCode()).isEqualTo(ONBOARDINGSUCCEEDED);
+
+        final Property property = propertyApi.getProperty(correlationId, "1000", propertyId)
+                .map(ExpediaResponse::getEntity)
+                .toBlocking()
+                .single();
+
+        assertThat(property.getExpediaId()).isNotNull();
+        assertThat(property.getName()).isNotNull();
+        assertThat(property.getAddresses()).isNotNull();
+        assertThat(property.getProvider().equals("1000"));
+        assertThat(property.getProviderPropertyId().equals(propertyId));
     }
 }
