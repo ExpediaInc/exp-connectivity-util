@@ -12,6 +12,8 @@ public class ExpediaRetryer implements Retryer {
 
     private final int maxAttempts;
     private final long intervalInMillis;
+
+    @Builder.Default
     private int attempts = 1;
 
     @Override
