@@ -31,14 +31,14 @@ public class GetProperty {
         final String correlationId = randomUUID().toString();
         final String propertyId = "11112";
 
-        final PropertyStatus status = propertyApi.getPropertyStatus(correlationId, "1000", propertyId)
+        final PropertyStatus status = propertyApi.getPropertyStatus(correlationId, "test", propertyId)
             .map(ExpediaResponse::getEntity)
             .toBlocking()
             .single();
 
         assertThat(status.getCode()).isEqualTo(ONBOARDINGSUCCEEDED);
 
-        final Property property = propertyApi.getProperty(correlationId, "1000", propertyId)
+        final Property property = propertyApi.getProperty(correlationId, "test", propertyId)
                 .map(ExpediaResponse::getEntity)
                 .toBlocking()
                 .single();

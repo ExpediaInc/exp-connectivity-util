@@ -40,14 +40,14 @@ public class OnboardingExample {
     @Test
     public void onboardProperty() {
 
-        final String requestId = randomUUID().toString();
+        final String propertyId = randomUUID().toString();
         final String correlationId = randomUUID().toString();
-        final Property property = buildTestProperty(requestId);
-        final String providerId = "1000";
+        final Property property = buildTestProperty(propertyId);
+        final String provider = "test";
 
         // Create the property On Expedia
         final List<Property> properties = propertyApi
-            .createOrUpdateProperties(requestId, providerId, singletonList(property))
+            .createOrUpdateProperties(correlationId, provider, singletonList(property))
             .map(ExpediaResponse::getEntity)
             .toBlocking()
             .first();
@@ -60,7 +60,7 @@ public class OnboardingExample {
 
         // Poll the server until onboarding process is complete
         final Integer expediaId = propertyApi
-            .getPropertyStatus(correlationId, providerId, onboardedProperty.getProviderPropertyId())
+            .getPropertyStatus(correlationId, provider, onboardedProperty.getProviderPropertyId())
             .map(ExpediaResponse::getEntity)
             .repeatWhen(observable -> observable.delay(5, SECONDS))
             .first(response -> response.getCode().equals(StatusCodes.ONBOARDINGSUCCEEDED))
