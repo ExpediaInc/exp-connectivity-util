@@ -1,5 +1,7 @@
 package com.expedia.eps.product.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -25,4 +27,17 @@ public class RoomType {
     private RoomSize roomSize;
     private List<RoomViewModel> views;
     private Boolean wheelchairAccessibility;
+
+    @JsonProperty("_links")
+    private RoomType.Links links;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Links {
+
+        private Link self;
+
+    }
 }
