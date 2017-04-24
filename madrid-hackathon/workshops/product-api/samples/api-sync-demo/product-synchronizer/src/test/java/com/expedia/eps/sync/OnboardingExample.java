@@ -13,12 +13,7 @@ import com.expedia.eps.ExpediaResponse;
 import com.expedia.eps.product.ProductApi;
 import com.expedia.eps.product.model.RoomType;
 import com.expedia.eps.property.PropertyApi;
-import com.expedia.eps.property.model.Address;
-import com.expedia.eps.property.model.Contact;
-import com.expedia.eps.property.model.PhoneNumber;
-import com.expedia.eps.property.model.Property;
-import com.expedia.eps.property.model.PropertyContacts;
-import com.expedia.eps.property.model.PropertyStatus;
+import com.expedia.eps.property.model.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +63,7 @@ public class OnboardingExample {
             .getPropertyStatus(correlationId, providerId, onboardedProperty.getProviderPropertyId())
             .map(ExpediaResponse::getEntity)
             .repeatWhen(observable -> observable.delay(5, SECONDS))
-            .first(response -> nonNull(response.getExpediaId()))
+            .first(response -> response.getCode().equals(StatusCodes.ONBOARDINGSUCCEEDED))
             .map(PropertyStatus::getExpediaId)
             .toBlocking()
             .single();
